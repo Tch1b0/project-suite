@@ -1,0 +1,28 @@
+#projectContainer {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
+    grid-row-gap: 3em;
+}
+
+.project {
+    margin: 5px;
+    border: 2px solid white;
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    text-align: center;
+    transition: 0.25s;
+}
+
+.project:hover {
+    background-color: rgba(34, 34, 34, 0.8);
+    cursor: pointer;
+}
+
+img {
+    width: 50px;
+}
