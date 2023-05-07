@@ -4,27 +4,46 @@ const vscode = acquireVsCodeApi();
 // elements
 const statusMessage = document.getElementById("statusMessage");
 const projectContainer = document.getElementById("projectContainer");
+const searchBar = document.getElementById("searchBar");
 
 // variables
 let projects = [];
+
+searchBar.addEventListener("input", (_) => {
+    const substr = searchBar.value.toLowerCase();
+    console.log(substr);
+    if (substr.length === 0) {
+        renderProjects(projects);
+    } else {
+        renderProjects(
+            projects.filter((v) => v.name.toLowerCase().includes(substr))
+        );
+    }
+});
 
 updateStatusMessage();
 
 window.addEventListener("message", (ev) => {
     projects = ev.data;
     state = "finished";
-    updateProjects();
+    renderProjects(projects);
 });
 
 function updateStatusMessage() {
     if (projects.length === 0) {
         statusMessage.textContent = "Loading...";
+        searchBar.style = "display: none;";
     } else {
         statusMessage.textContent = "";
+        searchBar.style = "display: block;";
     }
 }
 
-function updateProjects() {
+function renderProjects(projects) {
+    while (projectContainer.firstChild) {
+        projectContainer.removeChild(projectContainer.lastChild);
+    }
+
     for (const proj of projects) {
         const el = createProjectEl(proj);
         projectContainer.appendChild(el);

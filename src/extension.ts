@@ -39,7 +39,6 @@ export function activate(context: vscode.ExtensionContext) {
                     vscode.ViewColumn.One,
                     { enableScripts: true }
                 );
-
                 const scriptOnDiskPath = vscode.Uri.joinPath(
                     context.extensionUri,
                     "src",
@@ -93,6 +92,7 @@ function getSuite(script: string, style: string): string {
 </head>
 <body>
 	<p id="statusMessage"></p>
+	<div class="searchBarBox"><input type="text" id="searchBar" placeholder="🔎 Search Project" /></div>
 	<div id="projectContainer" ></div>
 	<script>${script}</script>
 </body>
