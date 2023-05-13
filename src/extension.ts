@@ -39,27 +39,23 @@ export function activate(context: vscode.ExtensionContext) {
                     vscode.ViewColumn.One,
                     { enableScripts: true }
                 );
-                const scriptOnDiskPath = vscode.Uri.joinPath(
-                    context.extensionUri,
-                    "src",
-                    "suiteview.js"
-                );
-                const suiteViewSrc =
-                    panel.webview.asWebviewUri(scriptOnDiskPath);
 
-                const styleOnDiskPath = vscode.Uri.joinPath(
-                    context.extensionUri,
-                    "src",
-                    "style.css"
-                );
-                const styleUri = panel.webview.asWebviewUri(styleOnDiskPath);
+                const getWebURI = (name: string) => {
+                    const onDisk = vscode.Uri.joinPath(
+                        context.extensionUri,
+                        "src",
+                        name
+                    );
+                    return panel.webview.asWebviewUri(onDisk);
+                };
+
+                const suiteViewSrc = getWebURI("suiteview.js");
+                const styleSrc = getWebURI("style.css");
 
                 panel.webview.html = getSuite(
                     (await fs.readFile(suiteViewSrc.fsPath)).toString(),
-                    (await fs.readFile(styleUri.fsPath)).toString()
+                    (await fs.readFile(styleSrc.fsPath)).toString()
                 );
-
-                console.log(panel.webview.html);
 
                 const path = context.globalState.get<string>("projects-path");
                 if (path) {
@@ -68,7 +64,6 @@ export function activate(context: vscode.ExtensionContext) {
                 }
 
                 panel.webview.onDidReceiveMessage(async (message) => {
-                    console.log(vscode.Uri.from(message.path));
                     await vscode.commands.executeCommand(
                         "vscode.openFolder",
                         vscode.Uri.file(message.path)
@@ -92,7 +87,7 @@ function getSuite(script: string, style: string): string {
 </head>
 <body>
 	<p id="statusMessage"></p>
-	<div class="searchBarBox"><input type="text" id="searchBar" placeholder="🔎 Search Project" /></div>
+	<div class="searchBarBox"><input type="text" id="searchBar" placeholder="🔎Search Project" /></div>
 	<div id="projectContainer" ></div>
 	<script>${script}</script>
 </body>
