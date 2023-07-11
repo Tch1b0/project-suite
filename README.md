@@ -1,6 +1,6 @@
 # project-suite
 
-Access your projects in VSCode
+Access your projects in VS Code
 
 ## Showcase
 
