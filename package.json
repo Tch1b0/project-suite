@@ -1,5 +1,8 @@
 {
     "name": "project-suite",
+    "author": {
+        "name": "Tch1b0"
+    },
     "displayName": "project-suite",
     "description": "browse your local projects",
     "version": "0.0.1",

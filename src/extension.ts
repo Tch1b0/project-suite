@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { getProjects } from "./projects";
 import { promptOrDefault } from "./utility";
 import * as fs from "node:fs/promises";
+import { js as suiteviewScript, css as suiteviewStyle } from "./suiteview";
 
 export function activate(context: vscode.ExtensionContext) {
     let path: string | null =
@@ -40,22 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
                     { enableScripts: true }
                 );
 
-                const getWebURI = (name: string) => {
-                    const onDisk = vscode.Uri.joinPath(
-                        context.extensionUri,
-                        "src",
-                        name
-                    );
-                    return panel.webview.asWebviewUri(onDisk);
-                };
-
-                const suiteViewSrc = getWebURI("suiteview.js");
-                const styleSrc = getWebURI("style.css");
-
-                panel.webview.html = getSuite(
-                    (await fs.readFile(suiteViewSrc.fsPath)).toString(),
-                    (await fs.readFile(styleSrc.fsPath)).toString()
-                );
+                panel.webview.html = getSuite();
 
                 const path = context.globalState.get<string>("projects-path");
                 if (path) {
@@ -76,20 +62,20 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-function getSuite(script: string, style: string): string {
+function getSuite(): string {
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" contente="width=device-width, initial-scale=1.0">
 	<title>Project Suite</title>
-	<style>${style}</style>
+	<style>${suiteviewStyle}</style>
 </head>
 <body>
 	<p id="statusMessage"></p>
 	<div class="searchBarBox"><input type="text" id="searchBar" placeholder="🔎Search Project" /></div>
 	<div id="projectContainer" ></div>
-	<script>${script}</script>
+	<script>${suiteviewScript}</script>
 </body>
 </html>`;
 }

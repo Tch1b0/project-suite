@@ -1,3 +1,52 @@
+export const css = `
+#projectContainer {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
+    grid-row-gap: 3em;
+}
+
+#searchBar {
+    width: 250px;
+    padding: 5px;
+    background: transparent;
+    color: white;
+    margin: 50px;
+    border-radius: 10px;
+    border: 2px solid white;
+    text-align: center;
+}
+
+.searchBarBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.project {
+    margin: 5px;
+    border: 3px solid white;
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    text-align: center;
+    transition: 0.25s;
+}
+
+.project:hover {
+    background-color: rgba(34, 34, 34, 0.8);
+    cursor: pointer;
+}
+
+img {
+    width: 50px;
+}
+`;
+export const js = `
 // imports
 const vscode = acquireVsCodeApi();
 
@@ -115,9 +164,10 @@ function getLangImageURL(langshort) {
             kt: "kotlin",
             md: "markdown",
         }[langshort] ?? langshort;
-    return `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${name}/${name}-original.svg`;
+    return \`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/\${name}/\${name}-original.svg\`;
 }
 
 function getDefaultImageURL() {
     return "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg";
 }
+`;
