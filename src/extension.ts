@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { getProjects } from "./projects";
 import { promptOrDefault } from "./utility";
-import { js as suiteviewScript, css as suiteviewStyle } from "./suiteview";
+import * as fs from "fs";
 import { Cache } from "./cache";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -37,7 +37,18 @@ export function activate(context: vscode.ExtensionContext) {
                     { enableScripts: true }
                 );
 
-                panel.webview.html = getSuite();
+                panel.webview.html = getSuite((name: string) => {
+                    return panel.webview.asWebviewUri(
+                        vscode.Uri.joinPath(context.extensionUri, "src", name)
+                    );
+                });
+
+                panel.webview.onDidReceiveMessage(async (message) => {
+                    await vscode.commands.executeCommand(
+                        "vscode.openFolder",
+                        vscode.Uri.file(message.path)
+                    );
+                });
 
                 const path = context.globalState.get<string>("projects-path");
                 if (path) {
@@ -48,13 +59,6 @@ export function activate(context: vscode.ExtensionContext) {
                     }
                     await panel.webview.postMessage(projects);
                 }
-
-                panel.webview.onDidReceiveMessage(async (message) => {
-                    await vscode.commands.executeCommand(
-                        "vscode.openFolder",
-                        vscode.Uri.file(message.path)
-                    );
-                });
             }
         )
     );
@@ -62,20 +66,34 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-function getSuite(): string {
+function getSuite(getWebURI: (name: string) => vscode.Uri): string {
+    let style = `{{STYLE}}`;
+    let script = `{{SCRIPT}}`;
+
+    // on the release build, the style.css file is inserted into the braced style below,
+    // so the length of the string won't equal 9
+    const isDebug = `{{STYLE}}`.length === 9;
+    if (isDebug) {
+        const suiteViewSrc = getWebURI("suiteview.js");
+        const styleSrc = getWebURI("style.css");
+
+        script = fs.readFileSync(suiteViewSrc.fsPath).toString();
+        style = fs.readFileSync(styleSrc.fsPath).toString();
+    }
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" contente="width=device-width, initial-scale=1.0">
 	<title>Project Suite</title>
-	<style>${suiteviewStyle}</style>
+	<style>${style}</style>
 </head>
 <body>
 	<p id="statusMessage"></p>
 	<div class="searchBarBox"><input type="text" id="searchBar" placeholder="🔎Search Project" /></div>
 	<div id="projectContainer" ></div>
-	<script>${suiteviewScript}</script>
+	<script>${script}</script>
 </body>
 </html>`;
 }
