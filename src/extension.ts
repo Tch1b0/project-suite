@@ -1,10 +1,12 @@
 import * as vscode from "vscode";
 import { getProjects } from "./projects";
 import { promptOrDefault } from "./utility";
-import * as fs from "node:fs/promises";
 import { js as suiteviewScript, css as suiteviewStyle } from "./suiteview";
+import { Cache } from "./cache";
 
 export function activate(context: vscode.ExtensionContext) {
+    const cache = Cache.get(context);
+
     let path: string | null =
         context.globalState.get<string>("projects-path") ?? null;
 
@@ -20,12 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
                     return;
                 }
                 context.globalState.update("projects-path", path);
-
-                try {
-                    console.log(getProjects(path));
-                } catch (e) {
-                    console.error(e);
-                }
             }
         )
     );
@@ -45,7 +41,11 @@ export function activate(context: vscode.ExtensionContext) {
 
                 const path = context.globalState.get<string>("projects-path");
                 if (path) {
-                    const projects = getProjects(path);
+                    let projects = cache.getProjects();
+                    if (projects === null) {
+                        projects = getProjects(path);
+                        cache.write(projects);
+                    }
                     await panel.webview.postMessage(projects);
                 }
 
