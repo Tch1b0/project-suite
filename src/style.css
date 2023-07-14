@@ -36,6 +36,7 @@
     transition: 0.25s;
 }
 
+#refreshButton,
 .project:hover {
     background-color: rgba(34, 34, 34, 0.8);
     cursor: pointer;
@@ -43,4 +44,13 @@
 
 img {
     width: 50px;
+}
+
+#refreshButton {
+    transition: 0.25s;
+    background-color: transparent;
+    border-radius: 10px;
+    border: 2px solid white;
+    color: white;
+    padding: 5px;
 }

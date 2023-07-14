@@ -5,6 +5,7 @@ const vscode = acquireVsCodeApi();
 const statusMessage = document.getElementById("statusMessage");
 const projectContainer = document.getElementById("projectContainer");
 const searchBar = document.getElementById("searchBar");
+const refreshButton = document.getElementById("refreshButton");
 
 // variables
 let projects = [];
@@ -19,6 +20,12 @@ searchBar.addEventListener("input", (_) => {
             projects.filter((v) => v.name.toLowerCase().includes(substr))
         );
     }
+});
+
+refreshButton.addEventListener("click", (_) => {
+    vscode.postMessage({
+        action: "refresh",
+    });
 });
 
 updateStatusMessage();

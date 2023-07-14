@@ -43,14 +43,29 @@ export function activate(context: vscode.ExtensionContext) {
                     );
                 });
 
+                const path = context.globalState.get<string>("projects-path");
                 panel.webview.onDidReceiveMessage(async (message) => {
-                    await vscode.commands.executeCommand(
-                        "vscode.openFolder",
-                        vscode.Uri.file(message.path)
-                    );
+                    switch (message.action) {
+                        case "open-project": {
+                            await vscode.commands.executeCommand(
+                                "vscode.openFolder",
+                                vscode.Uri.file(message.path)
+                            );
+                            break;
+                        }
+                        case "refresh": {
+                            // path HAS to exist here, because the "refresh" button,
+                            // which calls this action, is only loaded when path is set
+                            cache.write(getProjects(path!));
+                            // cached value HAS to exist, because it was set only a line previous
+                            await panel.webview.postMessage(cache.read()!);
+                            await vscode.window.showInformationMessage(
+                                "✔ Project Suite refreshed projects"
+                            );
+                        }
+                    }
                 });
 
-                const path = context.globalState.get<string>("projects-path");
                 if (path) {
                     let projects = cache.getProjects();
                     if (projects === null) {
@@ -91,7 +106,10 @@ function getSuite(getWebURI: (name: string) => vscode.Uri): string {
 </head>
 <body>
 	<p id="statusMessage"></p>
-	<div class="searchBarBox"><input type="text" id="searchBar" placeholder="🔎Search Project" /></div>
+	<div class="searchBarBox">
+        <input type="text" id="searchBar" placeholder="🔎Search Project" />
+        <button id="refreshButton">&#128260; Refresh</button>
+    </div>
 	<div id="projectContainer" ></div>
 	<script>${script}</script>
 </body>
