@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 
                 const path = context.globalState.get<string>("projects-path");
                 panel.webview.onDidReceiveMessage(async (message) => {
-                    switch (message.action) {
+                    switch (message.command) {
                         case "open-project": {
                             await vscode.commands.executeCommand(
                                 "vscode.openFolder",

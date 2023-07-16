@@ -12,7 +12,6 @@ let projects = [];
 
 searchBar.addEventListener("input", (_) => {
     const substr = searchBar.value.toLowerCase();
-    console.log(substr);
     if (substr.length === 0) {
         renderProjects(projects);
     } else {
@@ -24,7 +23,7 @@ searchBar.addEventListener("input", (_) => {
 
 refreshButton.addEventListener("click", (_) => {
     vscode.postMessage({
-        action: "refresh",
+        command: "refresh",
     });
 });
 
@@ -63,7 +62,6 @@ function createProjectEl(project) {
     const div = document.createElement("div");
     div.classList.add("project");
     div.onclick = async () => {
-        console.log(project.path);
         await vscode.postMessage({
             command: "open-project",
             path: project.path,
